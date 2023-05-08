@@ -102,6 +102,7 @@ def callback_status(pid, status):
     elif status == 2:
         print("unknown PID")
 
+'''
 def pub_binary_file(client, filename, topic):
     f = open(filename, 'rb')
     fObj = f.read()
@@ -109,12 +110,56 @@ def pub_binary_file(client, filename, topic):
     # print('sending message %s on topic %s' % (msg, topic))
     pub_status(client, topic, msg)
     f.close()
+'''
+    
+def pub_binary(client, topic, buffer, block_size=1024):
+    '''
+    MQTT publish a large buffer in seperate blocks.
+    import: math, time, gc, micropython
+    default block size 1024 bytes
+    '''
+    import math, time, gc
+    import micropython as mp
+    
+    num_blocks = math.ceil(len(buffer)/block_size)
+    print("Lenght of buffer in bytes: {}, block size: {}, number of blocks: {}".format(len(buffer), block_size, num_blocks))
+    for i in range(num_blocks):
+        try:
+            gc.collect() 
+            time.sleep_ms(100) 
+            #print(">>> memory info <<<")
+            #mp.mem_info()
+            
+            begin = i*block_size; end = begin+block_size;
+            if end > len(buffer):
+                end = len(buffer)
+            print(">>> Time: {}, Sending block nr. {}. Begin: {}, end: {}".format(time.time(), str(i), begin, end))
+            client.publish(topic, buffer[begin:end])
+            print("ok")
+            gc.collect() # ist das hier noch mal nötig? 
+            #mp.mem_info() # 
+            time.sleep_ms(1000) # testen ob das nötig ist
+            if end == len(buffer):
+                print("last block")
+                client.publish(topic, "end")
+                client.publish(topic, "Time: " + str(time.time()) +": All bytes sent.")
+                
+            else:
+                print("block nr. {}".format(i))
+                client.publish(topic, "Time: " + str(time.time()) +": Block "+ str(i+1)  + " of " + str(num_blocks)  + " sent.")
+        except Exception as err:
+            print("failed, error: {}".format(err))
+            break
+
     
 def main():
     server="192.168.178.36"
+    topic = "proj/camera"
+    ssid = 'GGSEC'
+    password = 'uZQna3UipqvSYJhgkEcI'
     
     # Connect to wifi:
-    connect_wifi('LS', 'sKNo9fmY0LWQ4Lqswso8')
+    connect_wifi(ssid, password)
 
     # Connect to MQTT broker:
     try:
@@ -123,30 +168,29 @@ def main():
         reconnect()
 
     # Subscribe to a topic:
-    sub(client, "proj/led", False)
+    # sub(client, "proj/led", False)
     
     while True:
         # checking for messages in subscribed topics:
-        client.check_msg()
+        # client.check_msg()
         
         # sending sensor data, no callback:
         msg1 = b'{'+str(read_dht20())+'}'
         print('sending message %s on topic %s' % (msg1, "proj/sensor"))
-        pub(client, "proj/sensor", msg1, 0)
+        pub(client, "proj/env", msg1, 0)
         
         time.sleep(1)
         
-        ''' using function pub_binary_file
+        
         # sending binary file via mqtt publish, with callback:
-        f=open("binary1", "rb")
+        f=open("file0.jpg", "rb")
         fObj=f.read()
         msg2 = binascii.b2a_base64(fObj)
-        print('sending message %s on topic %s' % (msg2, "proj/binary"))
-        pub_status(client, "proj/binary", msg2)
+        print('sending binary on topic {}'.format("proj/camera"))
+        pub_binary(client, "proj/camera", msg2[:1000])
         f.close()
-        time.sleep(1)
-        '''
         
+        input("press Enter")
         
 
 if __name__ == '__main__':
