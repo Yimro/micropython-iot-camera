@@ -22,6 +22,7 @@ image_count = 0
 num = 0
 topic = "proj/camera"
 filename = ""
+buf = bytearray(25000)
 
 # wifi
 mq.connect_wifi('GGSEC', 'uZQna3UipqvSYJhgkEcI')
@@ -59,19 +60,21 @@ while True:
         display.show()
         filename = "file"+str(num)+".jpg"
         #ua.getAndSaveImage(filename)
-        display.text("Pub.MQTT img. m{}".format(num), 3, 39, 1)
+        display.text("Pub.MQTT img. {}".format(num), 3, 39, 1)
         '''with open(filename, 'rb') as f:
             obj = f.read()
             msg = binascii.b2a_base64(obj)
             mq.pub(client, topic, msg[:500], 0)
             f.close()
         '''
-        msg = "Sent " + filename + " at " + str(time.time()) + " seconds since the epoch"
-        mq.pub(client, topic, msg, 0)
+        msg0 = "Sent " + filename + " at " + str(time.time()) + " seconds since the epoch"
+        msg1 = bytearray(1000)
+        mq.pub(client, topic, buf, 0)
+        mq.pub(client, topic, msg0, 0)
         display.show()
         time.sleep(5)
         num +=1
-        time.sleep(1)# call MQTT pub function
+        
         motion = False
     
     # no motion detected:

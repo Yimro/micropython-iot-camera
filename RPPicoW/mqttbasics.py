@@ -1,17 +1,11 @@
-"""
-This is a general demo file for:
-1) Reading dht20 sensor values and
-2) sending sensor values via mqtt publish.
-3) Subscribing to a mqtt topic and
-4) switch a led on/of/blink on receiving corresponding message.
-5) Measure respond time of the broker after publishing MQTT message.
-"""
-
 import time #for measuring response times
 import binascii #for converting binary files and back
 from dht20 import DHT20 #for reading sensor values
 from umqtt.simple2 import MQTTClient 
 from machine import I2C, Pin, Timer
+import json
+import gc
+import math
 
 # Create led object: 
 led = Pin(16, Pin.OUT, value=0)
@@ -111,46 +105,75 @@ def pub_binary_file(client, filename, topic):
     pub_status(client, topic, msg)
     f.close()
 '''
-    
+'''    
 def pub_binary(client, topic, buffer, block_size=1024):
-    '''
+    
     MQTT publish a large buffer in seperate blocks.
     import: math, time, gc, micropython
     default block size 1024 bytes
-    '''
+
     import math, time, gc
     import micropython as mp
     
     num_blocks = math.ceil(len(buffer)/block_size)
     print("Lenght of buffer in bytes: {}, block size: {}, number of blocks: {}".format(len(buffer), block_size, num_blocks))
+    print("Check: buffer size  = {}".format(str(num_blocks*block_size)))
     for i in range(num_blocks):
         try:
             gc.collect() 
-            time.sleep_ms(100) 
-            #print(">>> memory info <<<")
-            #mp.mem_info()
-            
+            time.sleep_ms(500)
             begin = i*block_size; end = begin+block_size;
-            if end > len(buffer):
-                end = len(buffer)
-            print(">>> Time: {}, Sending block nr. {}. Begin: {}, end: {}".format(time.time(), str(i), begin, end))
+            
+            if i == 0:
+                print("first block: {} bytes.".format(block_size))
+                client.publish(topic, b'b')
+            
+            print(">>> Time: {}, Sending block nr. {}. Begin: {}, end: {}, size: {}".format(time.time(), str(i), begin, end, (end-begin)))
             client.publish(topic, buffer[begin:end])
-            print("ok")
-            gc.collect() # ist das hier noch mal nötig? 
-            #mp.mem_info() # 
-            time.sleep_ms(1000) # testen ob das nötig ist
-            if end == len(buffer):
-                print("last block")
-                client.publish(topic, "end")
-                client.publish(topic, "Time: " + str(time.time()) +": All bytes sent.")
+            print("sent.")
+            
+            if i == num_blocks-1:
+                if end > len(buffer):
+                    end = len(buffer)
                 
-            else:
-                print("block nr. {}".format(i))
-                client.publish(topic, "Time: " + str(time.time()) +": Block "+ str(i+1)  + " of " + str(num_blocks)  + " sent.")
+                client.publish(topic, b'e')
+                
+            # gc.collect() # ist das hier noch mal nötig? 
+            # mp.mem_info() # für debugging
+            # time.sleep_ms(1000) # testen ob das nötig ist
+            
         except Exception as err:
             print("failed, error: {}".format(err))
             break
+'''
 
+def pub_file(client, file_name, block_size=2000):
+    f = open(file_name, "rb")
+    fobj = f.read()
+    flen = len(fobj)
+    num_blocks = math.ceil(flen/block_size)
+    
+    msg_info = {"file_size":flen, "num_blocks":num_blocks, "file_name":file_name}
+    msg_str = json.dumps(msg_info)
+    print("publishing {}.".format(msg_str))
+    client.publish("proj/camera", msg_str)
+    
+    #print("msg_info dict: {}".format(msg_info))
+    
+    print("publishing file")
+    for i in range(num_blocks):
+        gc.collect()
+        time.sleep_ms(70)
+        begin = i*block_size
+        end = begin + block_size
+        if end >= flen:
+            end = flen
+        msg_binary = fobj[begin:end]
+        #print("begin: {}, end: {}".format(begin, end))
+        client.publish("proj/camera", msg_binary)
+    f.close()
+    
+    
     
 def main():
     server="192.168.178.36"
@@ -175,20 +198,20 @@ def main():
         # client.check_msg()
         
         # sending sensor data, no callback:
-        msg1 = b'{'+str(read_dht20())+'}'
-        print('sending message %s on topic %s' % (msg1, "proj/sensor"))
-        pub(client, "proj/env", msg1, 0)
+        env = read_dht20()
+        env_dump = json.dumps(env)
+        print('sending message %s on topic %s' % (env_dump, "proj/sensor"))
+        pub(client, "proj/env", env_dump, 0)
+        
+        #gc.collect()
+        #time.sleep_ms(1000)
+        pub_file(client, "testfile2.jpg", 100) # block size 100 bytes 
+        
         
         time.sleep(1)
         
         
-        # sending binary file via mqtt publish, with callback:
-        f=open("file0.jpg", "rb")
-        fObj=f.read()
-        msg2 = binascii.b2a_base64(fObj)
-        print('sending binary on topic {}'.format("proj/camera"))
-        pub_binary(client, "proj/camera", msg2[:1000])
-        f.close()
+        
         
         input("press Enter")
         
