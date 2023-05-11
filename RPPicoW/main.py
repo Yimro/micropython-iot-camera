@@ -25,7 +25,7 @@ filename = ""
 buf = bytearray(25000)
 
 # wifi
-mq.connect_wifi('GGSEC', 'uZQna3UipqvSYJhgkEcI')
+mq.connect_wifi(ssid, password) # enter your ssid and password here
 
 # Connect to MQTT broker:
 try:
