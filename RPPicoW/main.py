@@ -61,12 +61,7 @@ while True:
         filename = "file"+str(num)+".jpg"
         #ua.getAndSaveImage(filename)
         display.text("Pub.MQTT img. {}".format(num), 3, 39, 1)
-        '''with open(filename, 'rb') as f:
-            obj = f.read()
-            msg = binascii.b2a_base64(obj)
-            mq.pub(client, topic, msg[:500], 0)
-            f.close()
-        '''
+ 
         msg0 = "Sent " + filename + " at " + str(time.time()) + " seconds since the epoch"
         msg1 = bytearray(1000)
         mq.pub(client, topic, buf, 0)

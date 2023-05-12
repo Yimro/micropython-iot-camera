@@ -1,9 +1,10 @@
-# projektstudium2023
-Controlling ESP32CAM over UART with a RP Pico W, publishing JPEG Files over MQTT 
+# micropython-iot-camera
 
-Warning: not fully functional yet.
+Controlling an ESP32CAM over UART with a Raspberry Pi Pico W. Images are published over MQTT 
+
 
 Eternal libraries needed: 
 ssd1306
 dht20 
 mqtt.simple2
+
