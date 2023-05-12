@@ -1,10 +1,29 @@
 # micropython-iot-camera
 
-Controlling an ESP32CAM over UART with a Raspberry Pi Pico W. Images are published over MQTT 
+Summary: 
+
+Collection of listings for a IoT project. Controlling an ESP32CAM over UART with a Raspberry Pi Pico W. Images are published to a MQTT broker. 
+
+This repository contains:
+
+ESP32CAM:
+Firmware for ESP32-CAM. Captures frames, sends them over UART to Pico W.
+
+RPB+:
+Python script for any subscriber, listening for MQTT-Messages and processing messages with jpg images. 
+
+RPPicoW:
+Micropython scripts for Pico W. Requests Images depending on sensor values, sends them via MQTT to broker. 
 
 
 Eternal libraries needed: 
-ssd1306
-dht20 
-mqtt.simple2
+
+ssd1306.py: 
+for the LCD-Display
+
+dht20.py:
+for the DHT20 Environment Sensor
+
+mqtt.simple2: 
+micropython MQTT libary
 
