@@ -20,8 +20,16 @@ def writeToFile(filename, buffer):
 def getAndSaveImage(filename):
     uart0.write("start")
     time.sleep(2)
-    rxData = readBytesUart()
-    writeToFile(filename, rxData)
+    
+    #rxData = readBytesUart()
+    rxData = bytes()
+    while(uart0.any() > 0):
+       rxData += uart0.read(1)
+    #writeToFile(filename, rxData)
+    with open(filename, 'wb') as f:
+        f.write(rxData)
+        print('Image written into {}'.format(filename))
+        f.close()
     
 def main():
     #time.sleep(20)

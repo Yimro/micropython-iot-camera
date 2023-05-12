@@ -28,14 +28,19 @@ def on_message(client, userdata, msg):
     print(">>> first block")
     msg_info = json.loads(msg.payload)
     print(msg_info)
+    block_size = msg_info["block_size"]    
     num_blocks = msg_info["num_blocks"]
     file_size = msg_info["file_size"]
     file_name = msg_info["file_name"]
     block_nr = 0
+
     deletefile(file_name)    
-    print("num blocks: {} ".format(msg_info["num_blocks"]))
+
+    print("file name: {} ".format(msg_info["file_name"]))    
     print("file size: {}".format(msg_info["file_size"]))
-    print("file name: {} ".format(msg_info["file_name"]))
+    print("block size: {}".format(msg_info["block_size"]))    
+    print("num blocks: {} ".format(msg_info["num_blocks"]))    
+
     
   else:
     block_nr += 1

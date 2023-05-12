@@ -1,5 +1,5 @@
 import time #for measuring response times
-import binascii #for converting binary files and back
+#import binascii #for converting binary files and back
 from dht20 import DHT20 #for reading sensor values
 from umqtt.simple2 import MQTTClient 
 from machine import I2C, Pin, Timer
