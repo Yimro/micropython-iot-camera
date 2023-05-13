@@ -1,11 +1,11 @@
-from machine import Pin, SPI, RTC
+from machine import Pin, SPI, RTC, UART
 from ssd1306 import SSD1306_SPI
-#from dht20 import DHT20
 from umqtt.simple2 import MQTTClient 
-import time, random, math, gc, json
+import time, random, math, gc, json, network
 
-import uartcam as ua
-import mqttbasics as mq
+#from dht20 import DHT20
+
+#import mqttbasics as mq
 import wificred as wf
 
 # infrared sensor
@@ -18,15 +18,6 @@ display = SSD1306_SPI(128, 64, spi, Pin(20), Pin(21), Pin(22))
 # mqtt settings
 server="192.168.178.36"
 topic = "proj/camera"
-
-# wifi
-mq.connect_wifi(wf.ssid, wf.password)
-
-# Connect to MQTT broker:
-try:
-    client = mq.connect(server)
-except OSError as e:
-    mq.reconnect()
 
 motion = False
 image_count = 0
@@ -48,6 +39,29 @@ def irq_handler(pin):
 # set interrupt on PIR sensor
 pir.irq(handler=irq_handler, trigger=Pin.IRQ_RISING)
 
+def getImage(filename, baudrate):
+    uart0 = UART(0, baudrate=baudrate, tx=Pin(0), rx=Pin(1), rxbuf=28000)
+    #time.sleep(1)
+    uart0.write("start")
+    time.sleep(2)
+    
+    #rxData = readBytesUart()
+    rxData = bytes()
+    n  = 0
+    while(uart0.any() > 0):
+       rxData += uart0.read(1)
+       n +=1 
+       if (n % 1024 == 0):
+           print(str(n/1024) + " kbytes -")
+    print("uartcam: file size: {} bytes".format(str(n)))
+    #writeToFile(filename, rxData)
+    with open(filename, 'wb') as f:
+        f.write(rxData)
+        print('uartcam: Image written into {}'.format(filename))
+        f.close()
+    uart0.deinit()
+    return n
+
 # publishing files over mqtt
 def pub_file(client, file_name, block_size=2000):
     f = open(file_name, "rb")
@@ -63,7 +77,7 @@ def pub_file(client, file_name, block_size=2000):
     print("pub_file: publishing file")
     for i in range(num_blocks):
         gc.collect()
-        time.sleep_ms(100)
+        time.sleep_ms(150)
         begin = i*block_size
         end = begin + block_size
         if end >= flen:
@@ -77,31 +91,65 @@ def pub_file(client, file_name, block_size=2000):
 def main():
     global motion, filename, num, x, y, xdir, ydir
     num = 0
+    
+    #connect to wifi
+    nic = network.WLAN(network.STA_IF)
+    nic.active(True)
+    nic.connect(wf.ssid, wf.password) 
+    while not nic.isconnected():
+        pass     
+    print(nic.ifconfig())
+    
+    try:
+        client = MQTTClient("myclient", server, 1883)
+        client.connect()
+    except:
+        time.sleep(5)
+        client.reconnect()
+        
     while True:
         filename = "file"+str(num)+".jpg"
         # motion detected:
         if motion:
-            print("motion")
+            print("main: motion")
             display.fill(0)
             display.text(" ALARM!", 30, 9, 1)
             display.text("saving {}".format(filename), 0, 20, 1)
             display.show()
+            time.sleep_ms(100)
             
-            ua.getAndSaveImage(filename)
+            
+            print("main: Getting image from camera over UART")
+            start_uart = time.ticks_ms()
+            size = getImage(filename, 2000000)
+            end_uart = time.ticks_ms()
+            diff_uart = end_uart-start_uart
+            speed_uart = size/diff_uart*1000
+            print("main: Finished transferring image over UART")
+            
+            print("main: UART transfer time: {} ms; bytes transferred: {}; transfer speed: {}".format(str(diff_uart), str(size), str(speed_uart)))
             
             
             display.text(" done ", 30, 30, 1)
             display.show()
-            print("main: publishing")
-            pub_file(client, filename, 1000)
-            print("main: done publishing")
-            display.text("Published: {}".format(filename), 3, 55, 1)
             
+            print("main: Start publishing to MQTT broker")
+            
+            pub_file(client, filename, 500)
+            start_pub = time.ticks_ms()
+            print("main: Done publishing to MQTT broker")
+            end_pub = time.ticks_ms()
+            diff_pub = end_pub-start_pub
+            
+            
+            display.text("Published: {}".format(filename), 3, 55, 1)
+            #print("main: MQTT publish time: {} ms; bytes transferred: {}".format(str(diff_uart), str(size), str(speed)))
+            
+            display.show()
             #msg0 = "Sent " + filename + " at " + str(time.time()) + " seconds since the epoch"
                         
             time.sleep(5)
-            num +=1
-            
+            num = (num+1)%10
             motion = False
         
         # show animation while no motion detected:

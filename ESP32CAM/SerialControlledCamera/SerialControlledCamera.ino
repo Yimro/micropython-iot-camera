@@ -10,7 +10,7 @@ const int ledPin = 4;  // very bright flash LED
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  Serial.begin(115200);  // make sure the other device uses same Baud rate!
+  Serial.begin(2000000);  // 115200 make sure the other device uses same Baud rate!
   //Serial.setDebugOutput(true);
 
   camera_config_t config;
@@ -52,13 +52,10 @@ void sendFrame() {
   digitalWrite(ledPin, HIGH);
   delay(50);
   fb = esp_camera_fb_get(); // saving frame to buffer
-  delay(100);
-  digitalWrite(ledPin, LOW);
-  Serial.write(fb->buf, fb->len); // writing image buffer to uart
-  digitalWrite(ledPin, HIGH);
   delay(50);
   digitalWrite(ledPin, LOW);
-
+  Serial.write(fb->buf, fb->len); // writing image buffer to uart
+  
   if (!fb) {
     Serial.println("Camera capture failed");
     delay(1000);
@@ -80,5 +77,5 @@ void loop() {
 
     else Serial.println("I dont understand");
   }
-  delay(500);
+  delay(100);
 }
