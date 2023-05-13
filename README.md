@@ -1,31 +1,36 @@
-# micropython-iot-camera
+# micropython-iot-camera #
 
-Summary: 
+## Summary: ##
 
 Collection of listings for a IoT project. Controlling an ESP32CAM over UART with a Raspberry Pi Pico W. Images are published to a MQTT broker. 
 
-This repository contains:
+This repository contains the following directories:
 
-ESP32CAM:
+
+### RPB+ ###
+Contains a Python script for a subscriber, listening for MQTT-Messages and processing messages containing jpg images. 
+
+### RPPicoW ###
+Micropython script for Pico W. Requests Images depending on PIR sensor values, saves images to flash, sends images via MQTT to a broker. 
+
+### ESP32CAM ###
 Firmware for ESP32-CAM. Captures frames, sends them over UART to Pico W. Written in C++.
 
-RPB+:
-Python script for any subscriber, listening for MQTT-Messages and processing messages containing jpg images. 
 
-RPPicoW:
-Micropython scripts for Pico W. Requests Images depending on sensor values, sends them via MQTT to broker. 
+## Eternal libraries needed: ##
 
-
-Eternal libraries needed: 
-
-ssd1306.py: 
+__ssd1306.py:__ 
 for the LCD-Display
+is included in the micropython repository: 
+[micropython on github](https://github.com/micropython/micropython)
 
-dht20.py:
+__dht20.py:__
 for the DHT20 Environment Sensor
+[pico-dht20](https://github.com/flrrth/pico-dht20)
 
-mqtt.simple2: 
-micropython MQTT libary
+micropython MQTT libary:
+[umqtt.simple2](https://github.com/fizista/micropython-umqtt.simple2)
 
 ESP32-CAM:
 Arduino-Libraries
+[espressif arduino esp32 cam libraries](https://github.com/espressif/arduino-esp32/tree/master/libraries/ESP32/examples/Camera/CameraWebServer)
