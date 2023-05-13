@@ -6,6 +6,8 @@ Collection of listings for a IoT project. Controlling an ESP32CAM over UART with
 
 This repository contains the following directories:
 
+### Fotos ###
+Some quick fotos of my setup.
 
 ### RPB+ ###
 Contains a Python script for a subscriber, listening for MQTT-Messages and processing messages containing jpg images. 
