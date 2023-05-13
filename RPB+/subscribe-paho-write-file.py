@@ -53,28 +53,9 @@ def on_message(client, userdata, msg):
     f.close()
     print("file {} closed".format(file_name))
 
-    #f.write(msg.payload)
-  #print("writing to file")
-  #f = open('testfile.jpg', 'ab')
-  #f.write(buf)
 
 
-try:
-  client = mqtt.Client()
-except Exception as e:
-  print(e)
-
-
-client.on_connect = on_connect
-client.on_message = on_message
-
-#client.connect("mqtt.eclipseprojects.io", 1883, 60)
-client.connect("192.168.178.36", 1883, 60)
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-
+# deleting file from disk:
 def deletefile(filename):
     import os
     if os.path.exists(file_name):
@@ -83,5 +64,18 @@ def deletefile(filename):
     else:
       print("File does not exist, nothing deleted")
 
+try:
+  client = mqtt.Client()
+except Exception as e:
+  print(e)
 
+client.connect("192.168.178.36", 1883, 60)
+
+client.on_connect = on_connect
+client.on_message = on_message
+
+# Blocking call that processes network traffic, dispatches callbacks and
+# handles reconnecting.
+# Other loop*() functions are available that give a threaded interface and a
+# manual interface.
 client.loop_forever()
