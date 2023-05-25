@@ -1,8 +1,9 @@
 # micropython-iot-camera #
 
 ## Summary: ##
+Work in progress. Motion detection security camera. I am using a ESP32-CAM as a pure camera, that sends images over uart to a Pico W. The Pico W processes the images and sends them to a MQTT broker. Why so complicated? Because I want to use Micropython to send images over MQTT. It is necessary to cut the files into small pieces to be able to send them over mqtt. A Python script at the receiver end puts the pieces together again. 
 
-Collection of listings for a IoT project. Controlling an ESP32CAM over UART with a Raspberry Pi Pico W. Images are published to a MQTT broker. 
+Soon I am going to try to install a modified Micropython firmware on the ESP32-CAM so this project will evolve, hopefully. When this is successfull, things will be a lot easier. 
 
 This repository contains the following directories:
 
@@ -13,7 +14,7 @@ Some quick fotos of my setup.
 Contains a Python script for a subscriber, listening for MQTT-Messages and processing messages containing jpg images. 
 
 ### RPPicoW ###
-Micropython script for Pico W. Requests Images depending on PIR sensor values, saves images to flash, sends images via MQTT to a broker. 
+Micropython script(s) for Pico W. Requests Images depending on PIR sensor values, saves images to flash, sends images via MQTT to a broker. I removed the ssd1306 display for simplicity and focus on the essential.
 
 ### ESP32CAM ###
 Firmware for ESP32-CAM. Captures frames, sends them over UART to Pico W. Written in C++.
