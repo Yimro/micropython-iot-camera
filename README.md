@@ -20,7 +20,7 @@ Micropython script(s) for Pico W. Requests Images depending on PIR sensor values
 Firmware for ESP32-CAM. Captures frames, sends them over UART to Pico W. Written in C++.
 
 
-##External libraries needed:
+## External libraries needed:
 
 __ssd1306.py:__ 
 for the LCD-Display
