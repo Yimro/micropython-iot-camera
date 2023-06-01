@@ -42,29 +42,6 @@ def irq_handler(pin):
 # set interrupt on PIR sensor
 pir.irq(handler=irq_handler, trigger=Pin.IRQ_RISING)
 
-'''def get_image_UART(filename, baudrate):
-    uart0 = UART(0, baudrate=baudrate, tx=Pin(0), rx=Pin(1), rxbuf=28000)
-    time.sleep(1)
-    uart0.write("start")
-    time.sleep(1)
-    
-    rxData = bytes()
-    n  = 0
-    while(uart0.any() > 0):
-       rxData += uart0.read(1)
-       n +=1 
-       if (n % 1024 == 0):
-           print(str(math.floor((n/1024)) + " kbytes -"))
-    print("get_image_UART: File size: {} bytes".format(str(n)))
-    #writeToFile(filename, rxData)
-    with open(filename, 'wb') as f:
-        f.write(rxData)
-        print('get_image_UART: Image written into {}'.format(filename))
-        f.close()
-    uart0.deinit()
-    return n
-'''
-
 def get_img(baudrate):
     '''
     Sets up UART connection, writes a command via UART, waits a little
@@ -97,6 +74,9 @@ def get_img(baudrate):
 
 # publishing files over mqtt
 def pub_file(client, file_name, block_size=2000):
+    '''
+    publishes a file in blocks because mqtt implementation does not support large chunks of binary data.
+    '''
     f = open(file_name, "rb")
     fobj = f.read()
     flen = len(fobj)
