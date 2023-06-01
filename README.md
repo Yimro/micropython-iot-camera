@@ -1,7 +1,7 @@
 # micropython-iot-camera
 
 ## Summary:
-Work in progress. Motion detection security camera. I am using a ESP32-CAM as a pure camera, programmed in C++/Arduino, that sends images over uart to a Pico W. The Pico W runs a Micropython Programm, processes the images and sends them to a MQTT broker. Why so complicated? Because I want to use Micropython to send images over MQTT. It is necessary to cut the files into small pieces to be able to send them over mqtt. A Python script at the receiver end puts the pieces together again. 
+Work in progress. Motion detection security camera. I am using a ESP32-CAM as a pure camera, programmed in C++/Arduino, that sends images over UART to a Pico W. The Pico W runs a Micropython Programm, processes the images and sends them to a MQTT broker. Why so complicated? Because I want to use Micropython to send images over MQTT. It is necessary to cut the files into small pieces to be able to send them over mqtt. A Python script at the receiver end puts the pieces together again. 
 
 I will try to install a modified Micropython firmware on the ESP32-CAM so this project can be programmed in micrpython only in future.
 
