@@ -16,7 +16,7 @@ This repository contains the following directories:
 ### MQTT-Publisher-pico-micropython
 Micropython script(s) for Pico W. Requests Images depending on PIR sensor values, saves images to flash, sends images to a MQTT broker.
 
-### MQTT-Publisher-ESP32CAM-micropython
+(### MQTT-Publisher-ESP32CAM-micropython
 I have installed this custom Micropython version on the ESP32-CAM: [https://github.com/shariltumin/esp32-cam-micropython-2022](https://github.com/shariltumin/esp32-cam-micropython-2022)
 
 ### Subscriber
