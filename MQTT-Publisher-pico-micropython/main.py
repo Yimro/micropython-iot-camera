@@ -72,7 +72,7 @@ def get_img(baudrate):
     time and speed.
     '''
     uart0 = UART(0, baudrate=baudrate, tx=Pin(0), rx=Pin(1), rxbuf=28000)
-    
+    gc.collect()
     uart0.write("start")
     time.sleep(3)
     start_time = time.ticks_ms()
@@ -80,7 +80,7 @@ def get_img(baudrate):
 
     if file_size > 0:
         rx = bytes()
-        for n in range(file_size-1):
+        for n in range(file_size):
             rx += uart0.read(1)
             if n % 1024 == 0 and n > 0:
                 print("get_img: rx: {} bytes".format(n))
@@ -125,7 +125,6 @@ def pub_file(client, file_name, block_size=2000):
     diff_pub = end_pub-start_pub
     pub_speed = math.floor(flen/diff_pub*1000)
     print("pub_file: finished publishing {}, size: {}, transfer speed: {} bytes/sec".format(file_name, flen, pub_speed))
-    
 
 
 def main():
@@ -158,7 +157,7 @@ def main():
             start_time = time.ticks_ms()
             
             # request image buffer from ESP32CAM:
-            buf = get_img(2000000)
+            buf = get_img(460800)
             
             # write image buffer to file:
             with open(filename, 'wb') as f:

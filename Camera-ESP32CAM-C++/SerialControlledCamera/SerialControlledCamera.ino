@@ -10,7 +10,7 @@ const int ledPin = 4;  // very bright flash LED
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  Serial.begin(2000000);  // 115200 make sure the other device uses same Baud rate!
+  Serial.begin(460800);  // 115200 make sure the other device uses same Baud rate!
   //Serial.setDebugOutput(true);
 
   camera_config_t config;
