@@ -83,13 +83,13 @@ def get_img(baudrate):
         for n in range(file_size-1):
             rx += uart0.read(1)
             if n % 1024 == 0 and n > 0:
-                print("rx: {} bytes".format(n))
+                print("get_img: rx: {} bytes".format(n))
     
     end_time = time.ticks_ms()
     diff_time = end_time-start_time
     speed = file_size/diff_time*1000
     
-    print("buffer size: {} bytes, transfer time: {} ms, speed: {} bytes/second".format(file_size, diff_time, math.floor(speed)))        
+    print("get_img: buffer size: {} bytes, transfer time: {} ms, speed: {} bytes/second".format(file_size, diff_time, math.floor(speed)))        
     
     uart0.deinit()
     return rx
@@ -123,6 +123,8 @@ def pub_file(client, file_name, block_size=2000):
     f.close()
     end_pub = time.ticks_ms()
     diff_pub = end_pub-start_pub
+    pub_speed = math.floor(flen/diff_pub*1000)
+    print("pub_file: finished publishing {}, size: {}, transfer speed: {} bytes/sec".format(file_name, flen, pub_speed))
     
 
 
@@ -156,35 +158,20 @@ def main():
             start_time = time.ticks_ms()
             
             # request image buffer from ESP32CAM:
-            buf = get_img(filename, 2000000)
+            buf = get_img(2000000)
             
             # write image buffer to file:
             with open(filename, 'wb') as f:
                 f.write(buf)
                 f.close()
-                print("file {} written".format(filename))
+                print("main: file {} written".format(filename))
 
-            # publish image via mqtt
-            print("main: Start publishing to MQTT broker")
-            
-            # pub_file needs client, filename and block size in bytes
+            # publish image via mqtt, pub_file needs client, filename and block size in bytes
             pub_file(client, filename, 500)
-            #print("main: MQTT publish time: {} ms; bytes transferred: {}".format(str(diff_uart), str(size), str(speed)))
-                
-            #msg0 = "Sent " + filename + " at " + str(time.time()) + " seconds since the epoch"
-                        
+                                   
             time.sleep(5)
             num = (num+1)%10
             motion = False       
         
-#if __name__ == '__main__':
-#   main()
-
-buf = get_img(2000000)
-
-#time.sleep(2)
-filename = "image.jpg"
-with open(filename, 'wb') as f:
-    f.write(buf)
-    print("file {} written".format(filename))
-    f.close()
+if __name__ == '__main__':
+   main()
