@@ -1,3 +1,15 @@
+'''
+This script runs on a Raspberry Pico W. 
+The Pico W has a motion sensor connected to pin 17. If a motion is detected,
+an interrupt fires and the Pico sends a request for an image via UART.
+At the other side of the line is another microcontroller, that is connected to a camera.
+This one saves one frame to a buffer and sends via the UART connection.
+The Pico W writes the buffer to a file and prints the transfer speed and time.
+Then, the Pico W sends the image via MQTT to a broker.
+
+'''
+
+
 from machine import Pin, I2C, RTC, UART
 from umqtt.simple2 import MQTTClient 
 import time, random, math, gc, json, network
@@ -30,7 +42,7 @@ def irq_handler(pin):
 # set interrupt on PIR sensor
 pir.irq(handler=irq_handler, trigger=Pin.IRQ_RISING)
 
-def get_image_UART(filename, baudrate):
+'''def get_image_UART(filename, baudrate):
     uart0 = UART(0, baudrate=baudrate, tx=Pin(0), rx=Pin(1), rxbuf=28000)
     time.sleep(1)
     uart0.write("start")
@@ -51,36 +63,34 @@ def get_image_UART(filename, baudrate):
         f.close()
     uart0.deinit()
     return n
+'''
 
 def get_img(baudrate):
+    '''
+    Sets up UART connection, writes a command via UART, waits a little
+    time and receives the image buffer via UART. It also prints the transfer
+    time and speed.
+    '''
     uart0 = UART(0, baudrate=baudrate, tx=Pin(0), rx=Pin(1), rxbuf=28000)
     
     uart0.write("start")
     time.sleep(3)
     start_time = time.ticks_ms()
     file_size = uart0.any()
-    
-    #while(uart0.any() > 0):
-    #   rx += uart0.read(1)
+
     if file_size > 0:
         rx = bytes()
         for n in range(file_size-1):
             rx += uart0.read(1)
             if n % 1024 == 0 and n > 0:
-                print(n)
+                print("rx: {} bytes".format(n))
     
     end_time = time.ticks_ms()
     diff_time = end_time-start_time
     speed = file_size/diff_time*1000
     
-    print("file size: {} bytes, transfer time: {} ms, speed: {} bytes/second".format(file_size, diff_time, math.floor(speed)))        
+    print("buffer size: {} bytes, transfer time: {} ms, speed: {} bytes/second".format(file_size, diff_time, math.floor(speed)))        
     
-    
-    '''with open(filename, 'wb') as f:
-        f.write(rx)
-        print('get_image_UART: Image ({} bytes) written into {}'.format(len, filename))
-        f.close()
-    '''
     uart0.deinit()
     return rx
 
@@ -95,9 +105,11 @@ def pub_file(client, file_name, block_size=2000):
     msg_info = {"file_size":flen, "block_size":block_size, "num_blocks":num_blocks, "file_name":file_name}
     msg_str = json.dumps(msg_info)
     print("pub_file: publishing {}.".format(msg_str))
+    
     client.publish("proj/camera", msg_str)
     
     print("pub_file: publishing file")
+    start_pub = time.ticks_ms()
     for i in range(num_blocks):
         gc.collect()
         time.sleep_ms(150)
@@ -109,11 +121,13 @@ def pub_file(client, file_name, block_size=2000):
         #print("begin: {}, end: {}".format(begin, end))
         client.publish("proj/camera", block)
     f.close()
+    end_pub = time.ticks_ms()
+    diff_pub = end_pub-start_pub
+    
 
 
 def main():
-    
-    global motion, filename, num, x, y, xdir, ydir, display_available
+    global motion, filename, num
     num = 0
     
     #connect to wifi
@@ -141,26 +155,20 @@ def main():
             print("main: Getting image from camera over UART/I2C")
             start_time = time.ticks_ms()
             
-            # request image from ESP32CAM:
-            size = get_img(filename, 2000000)
-            # size = get_image_I2C(i2c, 85)
-
-            end_time = time.ticks_ms()
-            diff_time = end_time-start_time
-            speed = size/diff_time*1000
-            print("main: Finished transferring image over UART")
-            print("main: UART transfer time: {} ms; bytes transferred: {}; transfer speed: {}"
-                  .format(str(diff_time), str(size), str(speed)))
+            # request image buffer from ESP32CAM:
+            buf = get_img(filename, 2000000)
             
+            # write image buffer to file:
+            with open(filename, 'wb') as f:
+                f.write(buf)
+                f.close()
+                print("file {} written".format(filename))
+
             # publish image via mqtt
             print("main: Start publishing to MQTT broker")
             
+            # pub_file needs client, filename and block size in bytes
             pub_file(client, filename, 500)
-            start_pub = time.ticks_ms()
-            print("main: Done publishing {} to MQTT broker".format(filename))
-            end_pub = time.ticks_ms()
-            diff_pub = end_pub-start_pub
-            
             #print("main: MQTT publish time: {} ms; bytes transferred: {}".format(str(diff_uart), str(size), str(speed)))
                 
             #msg0 = "Sent " + filename + " at " + str(time.time()) + " seconds since the epoch"
@@ -174,10 +182,9 @@ def main():
 
 buf = get_img(2000000)
 
-time.sleep(2)
-
-with open("filen.jpg", 'wb') as f:
+#time.sleep(2)
+filename = "image.jpg"
+with open(filename, 'wb') as f:
     f.write(buf)
-    #print('get_image_UART: Image ({} bytes) written into {}'.format(len, filename))
-    print("file written")
+    print("file {} written".format(filename))
     f.close()
