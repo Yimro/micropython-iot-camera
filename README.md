@@ -16,8 +16,8 @@ This repository contains the following directories:
 ### MQTT-Publisher-pico-micropython
 Micropython script(s) for Pico W. Requests Images depending on PIR sensor values, saves images to flash, sends images to a MQTT broker.
 
-(### MQTT-Publisher-ESP32CAM-micropython
-I have installed this custom Micropython version on the ESP32-CAM: [https://github.com/shariltumin/esp32-cam-micropython-2022](https://github.com/shariltumin/esp32-cam-micropython-2022)
+### todo MQTT-Publisher-ESP32CAM-micropython todo
+I have installed this custom Micropython version on the ESP32-CAM: [https://github.com/shariltumin/esp32-cam-micropython-2022](https://github.com/shariltumin/esp32-cam-micropython-2022). Here will be a micropython script for the AI Thinker ESP32CAM.
 
 ### Subscriber
 Contains a Python script for a subscriber, listening for MQTT-Messages and processing messages containing jpg images. It uses the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library.
