@@ -31,6 +31,9 @@ Contains a Python MQTT subscriber script. It listens for MQTT-Messages and saves
 Deprecated but working. 
 C++ sketch for ESP32-CAM. It captures frames, sends them over UART to Pico W. Written in C++.
 
+### MQTT-Publisher-pico-micropython-UART
+Deprecated. Scripts for Raspberry Pico W controlling a Camera and receiving images via UART.
+
 
 ## External libraries needed:
 
