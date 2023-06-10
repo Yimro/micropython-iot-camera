@@ -4,20 +4,23 @@
 Motion detection security camera, communicates over MQTT to a broker. Uses the following hardware components: 
  
 1. AI-Thinker ESP32-CAM, programmed in C++. Receives commands and sends images over UART. 
-2. Raspberry Pico W. Is running Micropython, sends commands via UART to the ESP32-CAM, receives images via UART, sends images via WiFi to a MQTT broker. Because of limited RAM, it is necessary to cut the files into small pieces to be able to send them over the MQTT protocol. 
-3. A mosquitto MQTT broker
+1. AI-Thinker ESP32-CAM, running micropython.
+
+2. (Raspberry Pico W. Is running Micropython, sends commands via UART to the ESP32-CAM, receives images via UART, sends images via WiFi to a MQTT broker. Because of limited RAM, it is necessary to cut the files into small pieces to be able to send them over the MQTT protocol.)
+3. A mosquitto MQTT broker, can be mqttx or mosquitto online broker or self hosted. See [mosquitto.org](mosquitto.org).
 4. A subscriber, which is a python script based on the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library.
 
 This is in progress. I have now managed to install micropython on a ESP32-CAM and will continue to programm this for motion detection, message & file transfer over MQTT.
-
 
 This repository contains the following directories:
 
 ### MQTT-Publisher-pico-micropython
 Micropython script(s) for Pico W. Requests Images depending on PIR sensor values, saves images to flash, sends images to a MQTT broker.
 
-### todo MQTT-Publisher-ESP32CAM-micropython todo
+### todo MQTT-Publisher-ESP32CAM-micropython-xxx todo
 I have installed this custom Micropython version on the ESP32-CAM: [https://github.com/shariltumin/esp32-cam-micropython-2022](https://github.com/shariltumin/esp32-cam-micropython-2022). Here will be a micropython script for the AI Thinker ESP32CAM.
+Some problems with this firmware.
+So, now, this firmware from [lemariva](https://github.com/lemariva/micropython-camera-driver) installed.
 
 ### Subscriber
 Contains a Python script for a subscriber, listening for MQTT-Messages and processing messages containing jpg images. It uses the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library.

@@ -4,11 +4,10 @@ The Pico W has a motion sensor connected to pin 17. If a motion is detected,
 an interrupt fires and the Pico sends a request for an image via UART.
 At the other side of the line is another microcontroller, that is connected to a camera.
 This one saves one frame to a buffer and sends via the UART connection.
-The Pico W writes the buffer to a file and prints the transfer speed and time.
+The Pico W writes the buffer to a file and prints the transfer speed and time to the REPL.
 Then, the Pico W sends the image via MQTT to a broker.
 
 '''
-
 
 from machine import Pin, I2C, RTC, UART
 from umqtt.simple2 import MQTTClient 
