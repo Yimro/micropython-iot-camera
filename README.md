@@ -7,7 +7,7 @@ Motion detection security camera written in micropython, communicates over MQTT 
 
 2. Raspberry Pi B+ . This runs a mosquitto MQTT broker. For the software, see [mosquitto.org](mosquitto.org).
 
-3. A PC or Laptop, running the __Subscriber__ python script, based on the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library.
+3. A PC or Laptop as MQTT subscriber, running a python script using the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library.
 
 This is work in progress. I have installed a [custom micropython firmware](https://github.com/shariltumin/esp32-cam-micropython-2022) on a ESP32-CAM. The ESP32-CAM will do motion detection, message & file transfer over MQTT.
 This repository contains the following directories:
