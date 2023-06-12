@@ -3,8 +3,6 @@ from umqtt.simple2 import MQTTClient
 from time import sleep, sleep_ms
 import camera, math, network, config, json, os, gc
 
-#AP = "GGSEC"
-#PWD = "uZQna3UipqvSYJhgkEcI"
 AP = wifi.AP
 PWD = wifi.PWD
 
