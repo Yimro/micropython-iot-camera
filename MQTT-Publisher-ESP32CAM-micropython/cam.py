@@ -1,11 +1,12 @@
 from machine import Pin, RTC, reset, SDCard
 from umqtt.simple2 import MQTTClient
 from time import sleep, sleep_ms
-import camera, math, network, config, json, os, gc
+import camera, math, network, config, json, os, gc, wifi
 
 AP = wifi.AP
 PWD = wifi.PWD
 
+flash = Pin(4, Pin.OUT)
 client = None
 
 def wlan():    
@@ -44,13 +45,14 @@ def mqttClientInit():
     client.connect()
     
 def SDCardInit():
+    sdc=SDCard()
     try:
-        sdc=SDCard()
-        os.mount(sdc, '/sd')
-        os.chdir('/sd')
-        print(f"SD card mounted")
+        os.mkdir('/sd')
     except:
-        print("SD card mount failure")
+        print("dir exists")
+    os.mount(sdc, '/sd')
+    os.chdir('/sd')
+    print(f"SD card mounted")
 
 def pubBuf(img, topic, fileName, bs=2000):
     li = len(img)
@@ -95,7 +97,11 @@ def loop():
                 print(">>>>>>>>>>>>>>>>MOTION DETECTED<<<<<<<<<<<<<<<<<<<<<")
                 
                 print(f"Diff: {math.floor(math.fabs(current_size-new_size))} pixels =  {round((math.fabs(current_size-new_size)/current_size*100),2)}%")
-                
+                flash.on()
+                sleep_ms(50)
+                img = camera.capture()
+                sleep_ms(50)
+                flash.off()
                 #Save image to file 
                 
                 
@@ -114,7 +120,12 @@ def loop():
                 print("sent MQTT message.")
                 
                     
-                pubBuf(img, topic2, fileName)
+                try:
+                    pubBuf(img, topic2, fileName)
+                except Exception as ex:
+                    print(ex)
+                    
+                    
                 num = 0
                 sleep(0.5)
                 
