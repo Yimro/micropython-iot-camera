@@ -1,12 +1,16 @@
 import paho.mqtt.client as mqtt
-#import binascii
-import json
-import time
+import json, time, os
 
 num_blocks = 0
 file_size = 0
 file_name = ""
 block_nr = 0
+
+try:
+    os.mkdir('images')
+except FileExistsError:
+    pass
+os.chdir('images/')
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -15,7 +19,6 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe("proj/images")
-    #client.subscribe("$SYS/#")
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -25,30 +28,31 @@ def on_message(client, userdata, msg):
     global file_size
     
     if b'mqtt_camera_image' in msg.payload:
-        print(">>> first block")
+        
         msg_info = json.loads(msg.payload)
         # print(msg_info)
+        msg_type = msg_info["type"]
+        file_name = msg_info["file_name"]
+        file_size = msg_info["file_size"]
         block_size = msg_info["block_size"]    
         num_blocks = msg_info["num_blocks"]
-        file_size = msg_info["file_size"]
-        file_name = msg_info["file_name"]
+    
         block_nr = 0
 
-        deletefile(file_name)    
-        print(f"receiving file. Name: {file_name}, size: {file_size}, blocks: {num_blocks}, block size: {block_size}")
+        #deletefile(file_name)    
+        print(f"new image. type: {msg_type}, name: {file_name}, \
+        size: {file_size}, blocks: {num_blocks}, block size: {block_size}")
     
     else:
         block_nr += 1
-        f  = open(file_name, "ab")
-        #buf = bytes(file_size)
-        print(">>>appending to buffer, block nr. {} ".format(block_nr))
-        f.write(msg.payload)
-        time.sleep(0.1)
+          
+        with open(file_name, "ab") as f:
+            #buf = bytes(file_size)
+            print(">>>appending to buffer, block nr. {} ".format(block_nr))
+            f.write(msg.payload)
+            time.sleep(0.2)
         if  block_nr == num_blocks:
-            f.close()
-            print("file {} closed".format(file_name))
-
-
+            print("file {} complete".format(file_name))
 
 # deleting file from disk:
 def deletefile(filename):
