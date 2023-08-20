@@ -8,6 +8,8 @@ Motion detection security camera written in micropython, communicates over MQTT 
 
 3. A MQTT subscriber, running a python script using the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library.
 
+4. A TCP server, written in python, receiving and saving images, sending them to e.g. Signal messenger
+
 I am using a [custom micropython firmware](https://github.com/shariltumin/esp32-cam-micropython-2022) on a ESP32-CAM. 
 The ESP32-CAM is responsible for motion detection, capturing images, message & file transfer over MQTT.
 This repository contains the following directories:
