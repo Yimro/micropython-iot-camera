@@ -54,6 +54,7 @@ def on_message(client, userdata, msg):
     global num_blocks
     global file_name
     global file_size
+    global send_signal
     
     if b'mqtt_camera_image' in msg.payload:
         now = datetime.datetime.now()
@@ -65,14 +66,18 @@ def on_message(client, userdata, msg):
         file_size = msg_info["file_size"]
         block_size = msg_info["block_size"]    
         num_blocks = msg_info["num_blocks"]
+        send_signal = msg_info["signal"]
     
         block_nr = 0
 
         #deletefile(file_name)    
-        print(f"new image. type: {msg_type}, name: {file_name}, \
-        size: {file_size}, blocks: {num_blocks}, block size: {block_size}")
-    
+        print(f"new image. type: {msg_type}, send signal message: {send_signal}")
+        print(f"file size: {file_size}, blocks: {num_blocks}, block size: {block_size}")
+        print('-----')        
+        print(f"File name: {file_name}")
+        print('-----')        
     else:
+        start = time.time()
         block_nr += 1
         try:  
             with open(file_name, "ab") as f:
@@ -82,6 +87,10 @@ def on_message(client, userdata, msg):
                 time.sleep(0.2)
             if  block_nr == num_blocks:
                 print("file {} complete".format(file_name))
+                end = time.time()
+                diff = end - start
+                print(f'done. {file_size} bytes in {diff} s, speed: {str(int(file_size/diff))} bytes/sec.')
+                
         except:
             print("something went wrong")
 

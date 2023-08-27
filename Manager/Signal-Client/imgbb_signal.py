@@ -1,14 +1,15 @@
 import base64
 import requests
 import json
-from keys import key_imgbb, phone, apikey
+import os
+from settings import key_imgbb, phone, apikey, IMG_SUBDIR, LOG_SUBDIR
 from time import sleep
 
 '''
-
+todo: 
+*key in external file
+*phone number and api key in seperate file
 '''
-
-
 
 def upl_imgbb(file_name):
     '''
@@ -16,8 +17,8 @@ def upl_imgbb(file_name):
     so you can use it in signal or telegram message.
     It returns the https url
     '''
-
-    with open(file_name, "rb") as file:
+    #os.chdir(IMG_SUBDIR)
+    with open(IMG_SUBDIR+file_name, "rb") as file:
         url = "https://api.imgbb.com/1/upload"
         payload = {
             "key": key_imgbb,
@@ -61,6 +62,16 @@ def send(file_name):
     3) Sends a signal message via 'calmebot.com'
     4) Returns True if sending signal message was succesful, False if not
     '''
-    img_url = upl_imgbb(file_name)
+    #testing:
+    print('imgbb_signal cwd:', os.getcwd())
+
+    #end testing
+    try:
+        img_url = upl_imgbb(file_name)
+    except Exception:
+        print("imgbb_signal: exception")
+        exc = sys.exception()
+        print("*** print_tb:")
+        traceback.print_tb(exc.__traceback__, limit=1, file=sys.stdout)
     sleep(3)
     return signal_mesg(img_url)
