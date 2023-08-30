@@ -16,23 +16,24 @@ hostname_tcp_server = '192.168.178.27'
 #hostname_tcp_server = '192.168.1.104'
 port_tcp_server = 5555
 
-#mqtt broker settings
+#mqtt settings
 hostname_mqtt_broker ='test.mosquitto.org'
 #hostname_mqtt_broker = '192.168.1.104'
 sub_topic = 'iotgg-1-sub'
 pub_topic = 'iotgg-1-pub'
 pub_topic_img = 'iotgg-1-img-pub'
 node_name = 'esp32cam-1'
+client = None
 
+#photo settings
 flash = Pin(4, Pin.OUT)
 current_image = None
-client = None
 img = None
 
 # these settings can be changed remotely via MQTT
 motion_detection = False #switch motion detection on/off
 send_signal = False #send images to signal on/off
-protocol = TCP #choose protocol (MQTT/ TCP)
+protocol = MQTT #choose protocol (MQTT/ TCP)
 block_size = 2048 # set MQTT block size for binary data
 
        
@@ -61,6 +62,7 @@ def subscriber_callback(sub_topic, msg, retain, dup):
         '''
         commands:      show list of MQTT commands \n
         photo:         take a photo and send it via signal to your phone \n
+        resend:        resend last photo
         reset:         reboot ESP32-CAM \n
         motionon:      set motion detection ON \n
         motionoff:     set motion detection OFF \n
@@ -78,24 +80,42 @@ def subscriber_callback(sub_topic, msg, retain, dup):
                 
     if msg == b'photo':
         print('photo')
-        
-        xxx = capture_image(True)
-        sleep_ms(2000)
+        global img
+        img = capture_image(True)
+        #sleep_ms(2000)
         if protocol == TCP:
             try:
-                send_buffer_tcp(hostname_tcp_server, port_tcp_server, xxx, send_signal)
+                send_buffer_tcp(hostname_tcp_server, port_tcp_server, img, send_signal)
                 client.publish(pub_topic, 'response to photo: photo sent to signal')
             except Exception as e:
                 print(f"error sending photo: {e}")
                 client.publish(pub_topic, 'response to photo: error uploading')
         if protocol == MQTT:
             try:
-                publish_buffer_mqtt(pub_topic_img, xxx)
+                publish_buffer_mqtt(pub_topic_img, img)
                 client.publish(pub_topic, 'response to photo: photo sent via mqtt')
             except Exception as e:
                 print(f"error sending photo: {e}")
                 client.publish(pub_topic, 'response to photo: error sending via mqtt')
                 
+    if msg == b'resend':
+        global img
+        if protocol == TCP:
+            try:
+                send_buffer_tcp(hostname_tcp_server, port_tcp_server, img, send_signal)
+                client.publish(pub_topic, 'response to resend: photo resent to signal')
+            except Exception as e:
+                print(f"error sending photo: {e}")
+                client.publish(pub_topic, 'response to resend: error uploading')
+                raise
+        if protocol == MQTT:
+            try:
+                publish_buffer_mqtt(pub_topic_img, img)
+                client.publish(pub_topic, 'response to resend: photo resent via mqtt')
+            except Exception as e:
+                print(f"error sending photo: {e}")
+                client.publish(pub_topic, 'response to resend: error sending via mqtt')
+        
         
     if msg == b'reset':
         client.publish(pub_topic, 'response to reset: resetting...', 1)
@@ -186,12 +206,12 @@ def publish_buffer_mqtt(topic, buf, bs=None):
             end = begin+bs
             if end >= len(buf):
                 end = len(buf)
-            block = img[begin:end]
+            block = buf[begin:end]
             client.publish(topic, block)
             print(f"publish_buffer_mqtt: published block {i} of {numBlocks}")
         print("publish_buffer_mqtt: publishing finished")
     except Exception as err:
-        print(f"ppublish_buffer_mqtt: Exc: {err=}, {type(err)=}")
+        print(f"publish_buffer_mqtt: Exc: {err=}, {type(err)=}")
         raise
 
 
@@ -232,19 +252,19 @@ def loop():
     global motion_detection
     global send_signal
     global protocol
+    global img
     client.publish(pub_topic, 'boot/reset: starting loop', 1)
     motion = False
     
     #measure time for taking scheduled photos, every 1 hour
     start_time = ticks_ms()
-    sleep_time=200
+    #sleep_time=200
     
-    #sett difference limit for motion detection
+    #relative difference between last 2 image sizes, used as a simple motion detection
     diff = 0.08
     
-    
     while True:
-        #wdt.feed()
+        wdt.feed()
         try:
             client.check_msg()
             sleep_ms(200)
@@ -267,7 +287,7 @@ def loop():
             
             #print(ticks_ms()-start_time)
             #print('.')
-            if (ticks_ms()-start_time)>3600000:
+            if (ticks_ms()-start_time)>30000:
                 start_time=ticks_ms()
                 print("loop: SCHEDULED IMAGE")
                 client.publish(pub_topic, 'scheduled photo', 1)
@@ -284,12 +304,11 @@ def loop():
                         client.publish(pub_topic, "could not connect to file server")
                 if protocol == MQTT:
                     print("TODO publishing via MQTT")
-                    publish_buffer_mqtt('iotgg-1-img-pub', img)
-                client.publish(pub_topic, 'transferred image to RPZero', 1)
+                    publish_buffer_mqtt('iotgg-1-img-pub', img, 512)
                 motion=False
                 
-            sleep_ms(sleep_time)
-            sleep_time=1000
+            sleep_ms(200)
+            #sleep_time=1000
 
         except KeyboardInterrupt:
             print("loop: Keyboard Interrupt")
@@ -310,7 +329,7 @@ try:
 except:
     pass
 assert camera.init()
-
+#camera.init()
 #sleep_ms(100)
 loop()
     
