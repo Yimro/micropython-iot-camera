@@ -9,13 +9,13 @@ AI-Thinker ESP32-CAM running a micropython script that sends jpg images. The ESP
 ### MQTT-Subscriber
 Python program(s) using the [mqtt-paho](https://pypi.org/project/paho-mqtt/) library. It receives binary data via MQTT and saves the data to disk for further processing. Images could then be easily sent to for exampe a mobile device. There are 2 versions of the subscriber. One 'real world' subscriber that receives camera images and processes them. And one for speed and reliability testing purposes. See README.md file in this folder.
 
-###TCP-Server
+### TCP-Server
 A TCP server, written in python, receiving and saving images, sending them to your phone via e.g. Signal (or Telegram) messenger
 
-###Signal-Client
+### Signal-Client
 Sends images to your phone via the Signal messenger. It uses a service called callmebot.
 
-##Broker
+## Broker
 You will need some sort of MQTT broker. I use both a locally installed mosquitto broker as well as a free available mosquitto test server: [https://test.mosquitto.org]
 
 
