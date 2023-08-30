@@ -264,7 +264,7 @@ def loop():
     diff = 0.08
     
     while True:
-        wdt.feed()
+        #wdt.feed()
         try:
             client.check_msg()
             sleep_ms(200)
@@ -299,12 +299,14 @@ def loop():
                 if protocol == TCP:
                     try:
                         send_buffer_tcp(hostname_tcp_server, port_tcp_server, img, send_signal)
+                        client.publish(pub_topic, 'sent image via TCP', 1)
                     except OSError:
                         print("could not connect to file server")
                         client.publish(pub_topic, "could not connect to file server")
                 if protocol == MQTT:
                     print("TODO publishing via MQTT")
-                    publish_buffer_mqtt('iotgg-1-img-pub', img, 512)
+                    publish_buffer_mqtt('iotgg-1-img-pub', img, 2048)
+                    client.publish(pub_topic, 'sent image via MQTT', 1)
                 motion=False
                 
             sleep_ms(200)
@@ -329,8 +331,7 @@ try:
 except:
     pass
 assert camera.init()
-#camera.init()
-#sleep_ms(100)
+
 loop()
     
 
