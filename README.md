@@ -1,8 +1,8 @@
-# micropython-iot-camera (running on Microcontroller)
+# micropython-iot-camera
 
 Motion detection security camera based on a ESP32-CAM, written in micropython, communicates over MQTT or TCP to a Mosquitto broker. The camera funtions are remote controlled via MQTT. This project needs the following hardware/software components:
 
-## ESP32CAM-micropython
+## ESP32CAM-micropython (microcontroller)
 AI-Thinker ESP32-CAM running a micropython script that sends jpg images. The ESP32-CAM Micropython firmware you can use: [https://github.com/shariltumin/esp32-cam-micropython-2022](https://github.com/shariltumin/esp32-cam-micropython-2022). The ESP32-CAM is responsible for motion detection, capturing images, message & file transfer over MQTT. See README.md file in this folder.
 
 ## Local programs
