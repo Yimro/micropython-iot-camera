@@ -2,7 +2,7 @@ import base64
 import requests
 import json
 import os
-from settings import key_imgbb, phone, apikey, IMG_SUBDIR, LOG_SUBDIR
+from settings import key_imgbb, phone, apikey, IMG_SUBDIR
 from time import sleep
 
 '''

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 '''
-This program listens for connections, saves streams into files.
+This program listens for connections, saves received binary streams into jpg files.
 '''
 
-import socket, datetime, os, time
+import socket, datetime, os, time, sys
+sys.path.append('/home/jimra/STU/PROJ/github/micropython-iot-camera/Local/Signal-Client')
 import imgbb_signal as sign
 from settings import IMG_SUBDIR, LOG_SUBDIR
 
-#Settings:
 MAIN_DIR = os.getcwd()
-ssignal = False
+send_signal = False
 
 def server():
     os.chdir(MAIN_DIR)
@@ -39,8 +39,8 @@ def append_to_log(file_name, text):
 
 
 def run_forever():   
-    global ssignal
-    ssignal = False
+    global send_signal
+    send_signal = False
     try:
         s = server()
         while True:
@@ -61,11 +61,11 @@ def run_forever():
 
             if(d.decode() == 'local'):
                 print('local true')
-                ssignal = False
+                send_signal = False
 
             if(d.decode() == 'remot'):
                 print('remot true')
-                ssignal = True
+                send_signal = True
                 
 #            else:
 #                print('error')
@@ -81,21 +81,17 @@ def run_forever():
 
             # receive and write blocks:
             byte_count = 0            
-            st = 0.0 # sleep time, unnötig?
             print("server: receiving file")
-            #time.sleep(st)
             start = time.time()
 
             try:                
                 d = conn.recv(2048)
-                time.sleep(st)
                 print('server:', end='')
                 while (len(d) > 0):
                     byte_count += len(d)
                     print('.', end='')      
                     f.write(d)
-                    d = conn.recv(1024)
-                    #time.sleep(st)
+                    d = conn.recv(2048)
                 end = time.time()
                 diff = end - start
                 print(f' done, {byte_count} bytes in {diff} seconds, speed: {str(int(byte_count/diff))} bytes/sec.')   
@@ -106,9 +102,9 @@ def run_forever():
                     ('%Y%m%d-%H%M%S') +  ': file locally saved: ' + file_name)
                 
                 file_sent = False
-                # if flag ssignal == True, file will be sent to Signal message 
+                # if flag send_signal == True, file will be sent to Signal message 
                 # using external Python script 
-                if ssignal == True:
+                if send_signal == True:
                     print('tcp server cwd:', os.getcwd())
                     file_sent = sign.send(file_name)
                         
