@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 
 '''
-todo:
-same like in server.py: 
-- use log files
-- measure transmission speed-> + in log file, CSV!
-- ggf. CSV auswerten
-- dirnames in constants
+This program recieves image data in MQTT messages.
+Single messages are usually 2kB so the microcontroller
+can handle it. This program receives some meta data first
+and assembles the MQTT messages to the original images,
+saves them to a file.
+Optionally it can send them via the callmebot service
+(https://callmebot.com) to a Signal messenger on a mobile
+device.
 
-(try other loop* functions)
+This program keeps a logfile.
+Settings in settings.py
+todo: (try other loop* functions)
 
 '''
 
@@ -18,7 +22,7 @@ from settings import IMG_SUBDIR, LOG_SUBDIR, DATA_SUBDIR
 from settings import HOSTNAME_MQTT_BROKER
 from settings import SUB_TOPIC, PUB_TOPIC, PUB_TOPIC_IMG
 
-sys.path.append('/home/jimra/STU/PROJ/github/micropython-iot-camera/Manager/Signal-Client')
+sys.path.append('/home/jimra/STU/PROJ/github/micropython-iot-camera/Local/Signal-Client')
 import imgbb_signal as sign
 
 num_blocks = 0

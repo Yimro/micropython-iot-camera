@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
+
 '''
-This program listens for connections, saves received binary streams into jpg files.
+This program listens for connections, saves received binary
+streams into jpg files. File name format: <date>-<time>.jpg
+It listens to the microcontroller. The microcontroller decides,
+if the images that will be sent, are sent to a Signal messenger.
+The microcontroller sends a string "local" or "remot" first. After
+this the actual image is sent.
+This program keeps a logfile.
+Settings in settings.py
 '''
 
 import socket, datetime, os, time, sys
@@ -137,16 +145,13 @@ def run_forever():
     except socket.timeout:
         if s is not None: 
             s.close()
-        restart()
+        run_forever()
 
     except Exception as e:
         if s is not None: 
             s.close()
         handle_exception(e)
     
-def restart():
-    run_forever()
-
 def handle_exception(e):
     print(e)
     exception_name = str(type(e).__name__)    
@@ -157,7 +162,3 @@ def handle_exception(e):
 
 
 run_forever()
-
-    
-   
-   

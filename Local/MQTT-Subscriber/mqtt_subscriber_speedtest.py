@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+'''
+This program is for speed and reliability testing of receiving and
+assembling binary data via MQTT.
+Logs and data are saved in files in seperate directories, see settings.py.
+Settings in settings.py
+
+'''
+
 import paho.mqtt.client as mqtt
 import json, time, os, datetime, sys, csv
 from settings import SPEEDTEST_DATA_SUBDIR, SPEEDTEST_LOG_SUBDIR, SPEEDTEST_TOPIC
