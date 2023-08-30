@@ -1,4 +1,4 @@
-###cam.py
+### cam.py
 Main functions of the camera: 
 - motion detection
 - saving images
@@ -7,20 +7,20 @@ Main functions of the camera:
 - The MQTT client also sends images in chunks as MQTT messages
 - TCP client for sending images via TCP
 
-###config.py
+### config.py
 Camera configuration.
 
-###main.py
+### main.py
 Starts cam.py after the ESP32-CAM boots.
 
-###mqtt_speedtest.py
+### mqtt_speedtest.py
 MQTT speed test for larger binary data, writes result in csv file.
 
-###network_functions.py
+### network_functions.py
 Functions for connects to wlan, sending http GET requests, connect to service to send Signal messenger messages.
 
-###wifi.py
+### wifi.py
 Your wifi credentials (not included)
 
-###README.md
+### README.md
 This file
