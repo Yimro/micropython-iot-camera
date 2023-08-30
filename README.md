@@ -16,7 +16,7 @@ A TCP server, written in python, receiving and saving images, sending them to yo
 Sends images to your phone via the Signal messenger. It uses a service called callmebot.
 
 ## Broker
-You will need some sort of MQTT broker. I use both a locally installed mosquitto broker as well as a free available mosquitto test server: [https://test.mosquitto.org]
+You will need some sort of MQTT broker. I use both a locally installed mosquitto broker as well as a free available mosquitto test server on (https://test.mosquitto.org).
 
 
 ## External libraries needed:
