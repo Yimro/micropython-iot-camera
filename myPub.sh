@@ -11,7 +11,7 @@ show_help() {
     echo "The script will prompt you for messages"
     echo "------------------------------------------------"
     echo "messages:" 
-    echo "com|commands, p|photo, rst|reset, mon|motionon, moff|motionoff"
+    echo "com|commands, p|photo, rst|reset, res|resend, mon|motionon, moff|motionoff"
     echo "st|status, son|signalon, soff|signaloff ptcp|protocltcp"
     echo "pmt|protocolmqtt, bs512|mqttbs512, bs1024|mqttbs1024, bs2048|mqttbs2048"
     echo "h|help, x|exit"
@@ -51,6 +51,8 @@ while true; do
     input='photo';;
     rst)
     input='reset';;
+    res)
+    input='resend';;
     mon)
     input='motionon';;
     moff)
