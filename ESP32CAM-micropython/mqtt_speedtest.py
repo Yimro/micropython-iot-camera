@@ -1,11 +1,14 @@
 import gc, os, math, json, usocket as socket
 from time import sleep_ms, ticks_ms
 from umqtt.simple2 import MQTTClient
-import network_functions as nf
+try:
+    import network_functions as nf
+except:
+    pass
 
 #mqtt settings
-hostname_mqtt_broker ='test.mosquitto.org'
-#hostname_mqtt_broker = '192.168.1.104'
+#hostname_mqtt_broker ='test.mosquitto.org'
+hostname_mqtt_broker = '192.168.1.136'
 node_name = 'esp32cam-1'
 topic = 'iotgg-speedtest'
 client = None
@@ -59,7 +62,10 @@ def send():
         #sleep_ms(10)
 
 #connect to wlan
-nf.wlan()
+try:
+    nf.wlan()
+except:
+    pass
 
 #create mqtt client
 client=MQTTClient(node_name, 'test.mosquitto.org', 1883)
