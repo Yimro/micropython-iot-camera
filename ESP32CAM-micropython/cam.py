@@ -192,23 +192,22 @@ def publish_buffer_mqtt(topic, buf, bs=None):
         bs = block_size
         
     try:         
-        numBlocks = math.ceil((len(buf)/bs))
+        num_blocks = math.ceil((len(buf)/bs))
         msgInfo = {'type':'mqtt_camera_image', 'file_size':len(buf), 'block_size':bs,
-                   'num_blocks':numBlocks, 'signal':send_signal }
+                   'num_blocks':num_blocks, 'signal':send_signal }
         msgStr = json.dumps(msgInfo, separators=(',', ':'))
         print(f"pub_buf: {msgStr}")
         # publishing info msg 
         client.publish(topic, msgStr)
         # publishing buffer in chunks:
-        for i in range (numBlocks):
-            
+        for i in range (num_blocks):            
             begin = i*bs
             end = begin+bs
             if end >= len(buf):
                 end = len(buf)
             block = buf[begin:end]
             client.publish(topic, block)
-            print(f"publish_buffer_mqtt: published block {i} of {numBlocks}")
+            print(f"publish_buffer_mqtt: published block {i} of {num_blocks}")
         print("publish_buffer_mqtt: publishing finished")
     except Exception as err:
         print(f"publish_buffer_mqtt: Exc: {err=}, {type(err)=}")
