@@ -13,7 +13,7 @@ Camera configuration.
 ### main.py
 Starts cam.py after the ESP32-CAM boots.
 
-### mqtt_speedtest.py
+### mqtt_publisher_speedtest.py
 MQTT speed test for larger binary data, writes result in csv file.
 
 ### network_functions.py

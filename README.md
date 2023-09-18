@@ -21,9 +21,6 @@ A TCP server, written in python, receiving and saving images, sending them to yo
 ### Signal-Client
 Sends images to your phone via the Signal messenger. It uses a service called callmebot.
 
-### myPub.sh
-Bash script to make testing of the microcontroller behaviour easier.
-
 ## MQTT Broker (local or remote)
 You will need some sort of MQTT broker. I use both a locally installed mosquitto broker as well as a free available mosquitto test server on https://test.mosquitto.org.
 
