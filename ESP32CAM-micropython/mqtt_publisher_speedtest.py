@@ -15,7 +15,6 @@ client = None
 
 def publish_buffer_mqtt(topic, buf, bs, write):
     
-        
     try:         
         numBlocks = math.ceil((len(buf)/bs))
         msgInfo = {'type':'mqtt_camera_image', 'length':len(buf), 'block_size':bs,
