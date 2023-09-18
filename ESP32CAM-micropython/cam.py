@@ -8,8 +8,9 @@ import network_functions as nf
 #wdt = WDT(timeout=30000)  # enable it with a timeout of 2s
 
 # constants
-MQTT=1;
-TCP=2;
+MQTT = 1
+TCP = 2
+
 
 #tcp settings:
 hostname_tcp_server = '192.168.178.27'
@@ -29,6 +30,7 @@ client = None
 flash = Pin(4, Pin.OUT)
 current_image = None
 img = None
+interval_scheduled_image = 30000
 
 # these settings can be changed remotely via MQTT
 motion_detection = False #switch motion detection on/off
@@ -198,7 +200,7 @@ def publish_buffer_mqtt(topic, buf, bs=None):
         msgStr = json.dumps(msgInfo, separators=(',', ':'))
         print(f"pub_buf: {msgStr}")
         # publishing info msg 
-        client.publish(topic, msgStr)
+        client.publish(topic, msgStr, 1)
         # publishing buffer in chunks:
         for i in range (num_blocks):            
             begin = i*bs
@@ -206,7 +208,7 @@ def publish_buffer_mqtt(topic, buf, bs=None):
             if end >= len(buf):
                 end = len(buf)
             block = buf[begin:end]
-            client.publish(topic, block)
+            client.publish(topic, block, 1)
             print(f"publish_buffer_mqtt: published block {i} of {num_blocks}")
         print("publish_buffer_mqtt: publishing finished")
     except Exception as err:
@@ -286,7 +288,7 @@ def loop():
             
             #print(ticks_ms()-start_time)
             #print('.')
-            if (ticks_ms()-start_time)>30000:
+            if (ticks_ms()-start_time)>interval_scheduled_image:
                 start_time=ticks_ms()
                 print("loop: SCHEDULED IMAGE")
                 client.publish(pub_topic, 'scheduled photo', 1)
