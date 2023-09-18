@@ -62,10 +62,7 @@ def send(file_name):
     3) Sends a signal message via 'calmebot.com'
     4) Returns True if sending signal message was succesful, False if not
     '''
-    #testing:
-    print('imgbb_signal cwd:', os.getcwd())
 
-    #end testing
     try:
         img_url = upl_imgbb(file_name)
     except Exception:
