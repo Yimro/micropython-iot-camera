@@ -15,11 +15,11 @@ LOG_SUBDIR = 'log/'
 DATA_SUBDIR = 'data/'
 
 # mqtt broker settings; use your broker hostname and topics 
-HOSTNAME_MQTT_BROKER ='test.mosquitto.org' 
+HOSTNAME_MQTT_BROKER ='192.168.178.36' 
 #hostname_mqtt_broker = '192.168.1.104'
-SUB_TOPIC = 'iotgg-1-sub'
-PUB_TOPIC = 'iotgg-1-pub'
-PUB_TOPIC_IMG = 'iotgg-1-img-pub'
+SUB_TOPIC = 'sensor/steuerung'
+PUB_TOPIC = 'sensor/monitoring'
+PUB_TOPIC_IMG = 'sensor/bilder'
 
 
 #--------------------------------------------------
@@ -32,6 +32,6 @@ SPEEDTEST_LOG_SUBDIR = 'mqtt_speedtest_data/'
 
 # broker settings; use your hostname and topics
 SPEEDTEST_MQTT_BROKER ='test.mosquitto.org' 
-# SPEEDTEST_MQTT_BROKER ='192.168.178.36' 
+#SPEEDTEST_MQTT_BROKER ='192.168.178.36' 
 SPEEDTEST_TOPIC = 'iotgg-speedtest'
 

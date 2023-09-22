@@ -32,7 +32,7 @@ def publish_buffer_mqtt(topic, buf, bs, write):
                 end = len(buf)
             block = buf[begin:end]
             client.publish(topic, block)
-            # sleep_ms(10) #comment out on ESP32CAM!!
+            #sleep_ms(5) #comment out on ESP32CAM!!
             #print(f"publish_buffer_mqtt: published block {i} of {numBlocks}")
         print("publish_buffer_mqtt: publishing finished")
     except Exception as err:
@@ -48,8 +48,8 @@ def send():
             for block_size in (512, 1024, 2048):
                 publish_buffer_mqtt(topic, buf, block_size, False)
                 #sleep_ms(10)
-            for block_size in (512, 1024, 2048):
-                publish_buffer_mqtt(topic, buf, block_size, True)
+            #for block_size in (512, 1024, 2048):
+            #    publish_buffer_mqtt(topic, buf, block_size, True)
                 #sleep_ms(10)  
         except Exception as err:
             print(f'error sending : Exc: {err=}, {type(err)=}')

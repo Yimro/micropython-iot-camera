@@ -101,7 +101,9 @@ def on_message(client, userdata, msg):
             bytes_object = bytes()
             
         except Exception as e:
-            print("data transfer not active, but no valid json message received.")          
+            print("data transfer not active, but no valid json message received.")
+            print(e)
+            raise          
 
     else:
         block_nr += 1

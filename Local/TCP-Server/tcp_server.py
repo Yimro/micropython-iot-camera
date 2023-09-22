@@ -60,7 +60,7 @@ def run_forever():
             d = conn.recv(5)
 
             if(d.decode() == 'local'):
-                print('local true')
+#                print('local true')
                 send_signal = False
 
             if(d.decode() == 'remot'):

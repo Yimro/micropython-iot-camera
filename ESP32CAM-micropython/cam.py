@@ -13,16 +13,17 @@ TCP = 2
 
 
 #tcp settings:
-hostname_tcp_server = '192.168.178.27'
+hostname_tcp_server = '192.168.178.36'
 #hostname_tcp_server = '192.168.1.104'
 port_tcp_server = 5555
 
 #mqtt settings
-hostname_mqtt_broker ='test.mosquitto.org'
+#hostname_mqtt_broker ='test.mosquitto.org'
 #hostname_mqtt_broker = '192.168.1.104'
-sub_topic = 'iotgg-1-sub'
-pub_topic = 'iotgg-1-pub'
-pub_topic_img = 'iotgg-1-img-pub'
+hostname_mqtt_broker='192.168.178.36'
+sub_topic = 'sensor/steuerung'
+pub_topic = 'sensor/monitoring'
+pub_topic_img = 'sensor/bilder'
 node_name = 'esp32cam-1'
 client = None
 
@@ -30,7 +31,7 @@ client = None
 flash = Pin(4, Pin.OUT)
 current_image = None
 img = None
-interval_scheduled_image = 30000
+interval_scheduled_image = 3600000
 
 # these settings can be changed remotely via MQTT
 motion_detection = False #switch motion detection on/off
@@ -306,7 +307,7 @@ def loop():
                         client.publish(pub_topic, "could not connect to file server")
                 if protocol == MQTT:
                     print("TODO publishing via MQTT")
-                    publish_buffer_mqtt('iotgg-1-img-pub', img, 2048)
+                    publish_buffer_mqtt(pub_topic_img, img, 2048)
                     client.publish(pub_topic, 'sent image via MQTT', 1)
                 motion=False
                 
@@ -321,7 +322,7 @@ def loop():
 nf.wlan()
 
 #create mqtt client
-client=MQTTClient(node_name, 'test.mosquitto.org', 1883)
+client=MQTTClient(node_name, hostname_mqtt_broker, 1883)
 
 client.set_callback(subscriber_callback)
 client.connect()

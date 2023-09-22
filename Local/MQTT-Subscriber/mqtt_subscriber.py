@@ -32,6 +32,7 @@ file_name = ""
 block_nr = 0
 send_signal = False
 start_time = 0
+transferring = False
 
 # directories for files:
 MAIN_DIR = os.getcwd()
@@ -71,7 +72,7 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(PUB_TOPIC_IMG)
-
+    print(f"Subscribed to: {PUB_TOPIC_IMG} ")
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     
@@ -82,9 +83,9 @@ def on_message(client, userdata, msg):
     global block_size
     global send_signal
     global start
-
+    global data_transfer_active
+    
     if b'mqtt_camera_image' in msg.payload:
-
         msg_info = json.loads(msg.payload)
 
         msg_type = msg_info["type"]
@@ -100,14 +101,16 @@ def on_message(client, userdata, msg):
 
         start = time.time()
         block_nr = 0
+        data_transfer_active = True
 
         print(f"new image. type: {msg_type}, send signal message: {send_signal}")
         print(f"file size: {file_size}, blocks: {num_blocks}, block size: {block_size}")
         print('-----------------------------------')        
         print(f"File will be saved as: {file_name}")
         print('-----------------------------------')
-    else:
+    if data_transfer_active:
         block_nr += 1
+        #print("length:", len(msg.payload))
         try:  
             with open(file_name, "ab") as f:
                 print("appending block nr. {} to file".format(block_nr))
@@ -116,12 +119,12 @@ def on_message(client, userdata, msg):
                 print("file {} complete".format(file_name))
                 end = time.time()
                 diff = end - start
-                
+                transferring = False
                 print(f'{file_size} bytes received in {diff} s, speed: {str(int(file_size/diff))} bytes/sec.')
                 append_to_log('mqtt_subscriber.log', f'{file_size} bytes received in {diff} s, speed: {str(int(file_size/diff))} bytes/sec.' )
 
                 data_row=[str(start), str(end), str(file_size), str(block_size)]
-                print(data_row)
+                #print(data_row)
                 append_to_data(data_row)
 
 
