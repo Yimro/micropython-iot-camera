@@ -89,103 +89,103 @@ def subscriber_callback(sub_topic, msg, retain, dup):
         if protocol == TCP:
             try:
                 send_buffer_tcp(hostname_tcp_server, port_tcp_server, img, send_signal)
-                client.publish(pub_topic, 'response to photo: photo sent to signal')
+                client.publish(pub_topic, 'response to photo: photo sent to signal', qos=1)
             except Exception as e:
                 print(f"error sending photo: {e}")
-                client.publish(pub_topic, 'response to photo: error uploading')
+                client.publish(pub_topic, 'response to photo: error uploading', qos=1)
         if protocol == MQTT:
             try:
                 publish_buffer_mqtt(pub_topic_img, img)
-                client.publish(pub_topic, 'response to photo: photo sent via mqtt')
+                client.publish(pub_topic, 'response to photo: photo sent via mqtt', qos=1)
             except Exception as e:
                 print(f"error sending photo: {e}")
-                client.publish(pub_topic, 'response to photo: error sending via mqtt')
+                client.publish(pub_topic, 'response to photo: error sending via mqtt', qos=1)
                 
     if msg == b'resend':
         global img
         if protocol == TCP:
             try:
                 send_buffer_tcp(hostname_tcp_server, port_tcp_server, img, send_signal)
-                client.publish(pub_topic, 'response to resend: photo resent to signal')
+                client.publish(pub_topic, 'response to resend: photo resent to signal', qos=1)
             except Exception as e:
                 print(f"error sending photo: {e}")
-                client.publish(pub_topic, 'response to resend: error uploading')
+                client.publish(pub_topic, 'response to resend: error uploading', qos=1)
                 raise
         if protocol == MQTT:
             try:
                 publish_buffer_mqtt(pub_topic_img, img)
-                client.publish(pub_topic, 'response to resend: photo resent via mqtt')
+                client.publish(pub_topic, 'response to resend: photo resent via mqtt', qos=1)
             except Exception as e:
                 print(f"error sending photo: {e}")
-                client.publish(pub_topic, 'response to resend: error sending via mqtt')
+                client.publish(pub_topic, 'response to resend: error sending via mqtt', qos=1)
         
         
     if msg == b'reset':
-        client.publish(pub_topic, 'response to reset: resetting...', 1)
+        client.publish(pub_topic, 'response to reset: resetting...', qos=1)
         print('reset')
         reset()
         
     if msg == b'motionoff':
-        client.publish(pub_topic, 'response to motionoff: motion detection OFF', 1)
+        client.publish(pub_topic, 'response to motionoff: motion detection OFF', qos=1)
         print('stop motion detection')
         motion_detection = False
         
     if msg == b'motionon':
-        client.publish(pub_topic, 'response to motionon: motion detection ON', 1)
+        client.publish(pub_topic, 'response to motionon: motion detection ON', qos=1)
         print('start motion detection')
         motion_detection = True
             
     if msg == b'status':
         #answer = 'response to status: motion_detection: ' + str(motion_detection) + ', send_signal: '+ str(send_signal)
         if motion_detection:
-            client.publish(pub_topic, 'status: motion detection ON', 1)
+            client.publish(pub_topic, 'status: motion detection ON', qos=1)
         else:
-            client.publish(pub_topic, 'status: motion detection OFF', 1)
+            client.publish(pub_topic, 'status: motion detection OFF', qos=1)
         if send_signal:    
-            client.publish(pub_topic, 'status: signal ON', 1)
+            client.publish(pub_topic, 'status: signal ON', qos=1)
         else:
-            client.publish(pub_topic, 'status: signal OFF', 1)
+            client.publish(pub_topic, 'status: signal OFF', qos=1)
         if protocol == MQTT:
-            client.publish(pub_topic, 'status: protocol MQTT', 1)
+            client.publish(pub_topic, 'status: protocol MQTT', qos=1)
         if protocol == TCP:
-            client.publish(pub_topic, 'status: protocol TCP', 1)
+            client.publish(pub_topic, 'status: protocol TCP', qos=1)
             
-        client.publish(pub_topic, 'status: MQTT block size: '+str(block_size), 1)
+        client.publish(pub_topic, 'status: MQTT block size: '+str(block_size), qos=1)
             
         print('status')
         
     if msg == b'signalon':
-        client.publish(pub_topic, 'response to signalon: signal ON', 1)
+        client.publish(pub_topic, 'response to signalon: signal ON', qos=1)
         print('signal ON')
         send_signal=True
         
     if msg == b'signaloff':
-        client.publish(pub_topic, 'response to signaloff: signal OFF', 1)
+        client.publish(pub_topic, 'response to signaloff: signal OFF', qos=1)
         print('signal OFF')
         send_signal=False
         
     if msg == b'protocoltcp':
-        client.publish(pub_topic, 'response to protocoltcp: protocol set to TCP', 1)
+        client.publish(pub_topic, 'response to protocoltcp: protocol set to TCP', qos=1)
         print('protocol set to TCP')
         protocol = TCP
         
     if msg == b'protocolmqtt':
-        client.publish(pub_topic, 'response to protocolmqtt: protocol set to MQTT', 1)
+        client.publish(pub_topic, 'response to protocolmqtt: protocol set to MQTT', qos=1)
         print('protocol set to MQTT')
         protocol = MQTT
         
     if msg == b'mqttbs512':
-        client.publish(pub_topic, 'response to bqttbs512: MQTT block size set to 512 bytes', 1)
+        client.publish(pub_topic, 'response to bqttbs512: MQTT block size set to 512 bytes', qos=1)
         print('MQTT block size set to 512 bytes')
         block_size = 512
         
     if msg == b'mqttbs1024':
-        client.publish(pub_topic, 'response to bqttbs1024: MQTT block size set to 512 bytes', 1)
+        client.publish(pub_topic, 'response to bqttbs1024: MQTT block size set to 512 bytes', qos=1)
         print('MQTT block size set to 1024 bytes')
         block_size = 1024
     
     if msg == b'mqttbs2048':
-        client.publish(pub_topic, 'response to bqttbs1024: MQTT block size set to 2048 bytes', 1)
+        client.publish(pub_topic, 'response to bqttbs1024: MQTT block size set to 2048 bytes', qos=1)
         print('MQTT block size set to 2048 bytes')
         block_size = 2048
         
@@ -201,7 +201,7 @@ def publish_buffer_mqtt(topic, buf, bs=None):
         msgStr = json.dumps(msgInfo, separators=(',', ':'))
         print(f"pub_buf: {msgStr}")
         # publishing info msg 
-        client.publish(topic, msgStr, 1)
+        client.publish(topic, msgStr, qos=1)
         # publishing buffer in chunks:
         for i in range (num_blocks):            
             begin = i*bs
@@ -209,7 +209,7 @@ def publish_buffer_mqtt(topic, buf, bs=None):
             if end >= len(buf):
                 end = len(buf)
             block = buf[begin:end]
-            client.publish(topic, block, 1)
+            client.publish(topic, block, qos=1)
             print(f"publish_buffer_mqtt: published block {i} of {num_blocks}")
         print("publish_buffer_mqtt: publishing finished")
     except Exception as err:
@@ -255,7 +255,7 @@ def loop():
     global send_signal
     global protocol
     global img
-    client.publish(pub_topic, 'boot/reset: starting loop', 1)
+    client.publish(pub_topic, 'boot/reset: starting loop', qos=1)
     motion = False
     
     #measure time for taking scheduled photos, every 1 hour
@@ -284,7 +284,7 @@ def loop():
                 if rel_diff_curr_new > diff: 
                     print(f"loop: MOTION DETECTED, difference: {rel_diff_curr_new}")
                     #print(rel_diff_curr_new)
-                    client.publish(pub_topic, 'motion detected', 1)
+                    client.publish(pub_topic, 'motion detected', qos=1)
                     motion=True
             
             #print(ticks_ms()-start_time)
@@ -292,7 +292,7 @@ def loop():
             if (ticks_ms()-start_time)>interval_scheduled_image:
                 start_time=ticks_ms()
                 print("loop: SCHEDULED IMAGE")
-                client.publish(pub_topic, 'scheduled photo', 1)
+                client.publish(pub_topic, 'scheduled photo', qos=1)
                 motion=True
             
             if motion:
@@ -301,14 +301,14 @@ def loop():
                 if protocol == TCP:
                     try:
                         send_buffer_tcp(hostname_tcp_server, port_tcp_server, img, send_signal)
-                        client.publish(pub_topic, 'sent image via TCP', 1)
+                        client.publish(pub_topic, 'sent image via TCP', qos=1)
                     except OSError:
                         print("could not connect to file server")
                         client.publish(pub_topic, "could not connect to file server")
                 if protocol == MQTT:
                     print("TODO publishing via MQTT")
                     publish_buffer_mqtt(pub_topic_img, img, 2048)
-                    client.publish(pub_topic, 'sent image via MQTT', 1)
+                    client.publish(pub_topic, 'sent image via MQTT', qos=1)
                 motion=False
                 
             sleep_ms(200)

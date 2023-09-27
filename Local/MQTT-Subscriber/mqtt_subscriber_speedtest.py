@@ -103,7 +103,7 @@ def on_message(client, userdata, msg):
         except Exception as e:
             print("data transfer not active, but no valid json message received.")
             print(e)
-            raise          
+            #raise          
 
     else:
         block_nr += 1

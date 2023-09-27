@@ -31,7 +31,7 @@ SPEEDTEST_DATA_SUBDIR = 'mqtt_speedtest_data/'
 SPEEDTEST_LOG_SUBDIR = 'mqtt_speedtest_data/'
 
 # broker settings; use your hostname and topics
-SPEEDTEST_MQTT_BROKER ='test.mosquitto.org' 
-#SPEEDTEST_MQTT_BROKER ='192.168.178.36' 
+#SPEEDTEST_MQTT_BROKER ='test.mosquitto.org' 
+SPEEDTEST_MQTT_BROKER ='192.168.178.36' 
 SPEEDTEST_TOPIC = 'iotgg-speedtest'
 

@@ -7,8 +7,8 @@ except:
     pass
 
 #mqtt settings
-hostname_mqtt_broker ='test.mosquitto.org'
-#hostname_mqtt_broker = '192.168.178.36'
+#hostname_mqtt_broker ='test.mosquitto.org'
+hostname_mqtt_broker = '192.168.178.36'
 node_name = 'esp32cam-1'
 topic = 'iotgg-speedtest'
 client = None
@@ -22,7 +22,7 @@ def publish_buffer_mqtt(topic, buf, bs, write):
         msgStr = json.dumps(msgInfo, separators=(',', ':'))
         print(f"publish_buffer_mqtt: {msgStr}")
         # publishing info msg 
-        client.publish(topic, msgStr)
+        client.publish(topic, msgStr, qos=1)
         # publishing buffer in chunks:
         for i in range (numBlocks):
             
@@ -31,8 +31,8 @@ def publish_buffer_mqtt(topic, buf, bs, write):
             if end >= len(buf):
                 end = len(buf)
             block = buf[begin:end]
-            client.publish(topic, block)
-            #sleep_ms(5) #comment out on ESP32CAM!!
+            client.publish(topic, block, qos=1)
+            #sleep_ms(0) #comment out on ESP32CAM!!
             #print(f"publish_buffer_mqtt: published block {i} of {numBlocks}")
         print("publish_buffer_mqtt: publishing finished")
     except Exception as err:
