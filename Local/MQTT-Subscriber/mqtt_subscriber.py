@@ -32,7 +32,8 @@ file_name = ""
 block_nr = 0
 send_signal = False
 start_time = 0
-transferring = False
+data_transfer_active = False
+data_transfer_finished = False
 
 # directories for files:
 MAIN_DIR = os.getcwd()
@@ -72,7 +73,7 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(PUB_TOPIC_IMG)
-    print(f"Subscribed to: {PUB_TOPIC_IMG} ")
+    print(f"Subscribed to: {PUB_TOPIC_IMG} on {HOSTNAME_MQTT_BROKER}")
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     
@@ -119,7 +120,7 @@ def on_message(client, userdata, msg):
                 print("file {} complete".format(file_name))
                 end = time.time()
                 diff = end - start
-                transferring = False
+                data_transfer_active = False
                 print(f'{file_size} bytes received in {diff} s, speed: {str(int(file_size/diff))} bytes/sec.')
                 append_to_log('mqtt_subscriber.log', f'{file_size} bytes received in {diff} s, speed: {str(int(file_size/diff))} bytes/sec.' )
 
