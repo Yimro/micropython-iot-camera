@@ -109,13 +109,13 @@ def on_message(client, userdata, msg):
         print('-----------------------------------')        
         print(f"File will be saved as: {file_name}")
         print('-----------------------------------')
-    if data_transfer_active:
+    else:
         block_nr += 1
-        #print("length:", len(msg.payload))
         try:  
             with open(file_name, "ab") as f:
                 print("appending block nr. {} to file".format(block_nr))
                 f.write(msg.payload)
+                print(f"wrote {len(msg.payload)} bytes")
             if  block_nr == num_blocks:
                 print("file {} complete".format(file_name))
                 end = time.time()
@@ -125,24 +125,18 @@ def on_message(client, userdata, msg):
                 append_to_log('mqtt_subscriber.log', f'{file_size} bytes received in {diff} s, speed: {str(int(file_size/diff))} bytes/sec.' )
 
                 data_row=[str(start), str(end), str(file_size), str(block_size)]
-                #print(data_row)
                 append_to_data(data_row)
 
-
         except Exception as e:
-            #handle_exception(e)
-            raise
+            handle_exception(e)
+            #raise
 
 def handle_exception(e):
     print(e)
     exception_name = str(type(e).__name__)    
     append_to_log('server.log', datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + ": server " + exception_name + ",  restarting now")
 
-
-
 client = mqtt.Client()
-
-
 client.connect(HOSTNAME_MQTT_BROKER, 1883, 60)
 
 client.on_connect = on_connect
@@ -153,4 +147,3 @@ client.on_message = on_message
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
 client.loop_forever()
-

@@ -14,18 +14,17 @@ topic = 'iotgg-speedtest'
 client = None
 
 def publish_buffer_mqtt(topic, buf, bs, write):
-    
-    try:         
+
+    try:
         numBlocks = math.ceil((len(buf)/bs))
         msgInfo = {'type':'mqtt_camera_image', 'length':len(buf), 'block_size':bs,
                    'num_blocks':numBlocks, 'write_to_file':write }
         msgStr = json.dumps(msgInfo, separators=(',', ':'))
         print(f"publish_buffer_mqtt: {msgStr}")
-        # publishing info msg 
+        # publishing info msg
         client.publish(topic, msgStr, qos=1)
         # publishing buffer in chunks:
         for i in range (numBlocks):
-            
             begin = i*bs
             end = begin+bs
             if end >= len(buf):
@@ -38,10 +37,10 @@ def publish_buffer_mqtt(topic, buf, bs, write):
     except Exception as err:
         print(f"publish_buffer_mqtt: Exc: {err=}, {type(err)=}")
         raise
-    
-    
+
+
 def send():
-    global topic    
+    global topic
     for i in range(21):
         buf = bytes(2**i)
         try:
@@ -50,10 +49,10 @@ def send():
                 #sleep_ms(10)
             #for block_size in (512, 1024, 2048):
             #    publish_buffer_mqtt(topic, buf, block_size, True)
-                #sleep_ms(10)  
+                #sleep_ms(10)
         except Exception as err:
             print(f'error sending : Exc: {err=}, {type(err)=}')
-            
+
         except KeyboardInterrupt:
             print("loop: Keyboard Interrupt")
             break
@@ -69,5 +68,3 @@ except:
 client=MQTTClient(node_name, hostname_mqtt_broker, 1883)
 client.connect()
 send()
-    
-
